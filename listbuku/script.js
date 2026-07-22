@@ -19,10 +19,30 @@ function tampilkanData() {
   // Kosongkan tampilan ul terlebih dahulu
   listBuku.innerHTML = '';
 
-  // Loop setiap data di dalam array
-  dataBuku.forEach((buku) => {
+  // Loop setiap data di dalam array beserta index-nya
+  dataBuku.forEach((buku, index) => {
     const li = document.createElement('li');
-    li.textContent = buku.nama; // Menampilkan nama buku
+    li.style.marginBottom = '8px';
+
+    // Buat elemen teks nama buku
+    const spanNama = document.createElement('span');
+    spanNama.textContent = buku.nama + ' ';
+    li.appendChild(spanNama);
+
+    // --- TOMBOL EDIT ---
+    const btnEdit = document.createElement('button');
+    btnEdit.textContent = 'Edit';
+    btnEdit.style.marginLeft = '8px';
+    btnEdit.addEventListener('click', () => editBuku(index));
+    li.appendChild(btnEdit);
+
+    // --- TOMBOL HAPUS ---
+    const btnHapus = document.createElement('button');
+    btnHapus.textContent = 'Hapus';
+    btnHapus.style.marginLeft = '4px';
+    btnHapus.addEventListener('click', () => hapusBuku(index));
+    li.appendChild(btnHapus);
+
     listBuku.appendChild(li);
   });
 }
@@ -56,9 +76,35 @@ function tambahBuku() {
   tampilkanData();
 }
 
-// 6. Jalankan fungsi tambahBuku saat tombol "Tambah" diklik
+// 6. Fungsi Edit Buku
+function editBuku(index) {
+  const namaBaru = prompt('Ubah nama buku:', dataBuku[index].nama);
+  
+  // Jika user mengisi nama baru dan tidak menekan cancel
+  if (namaBaru !== null && namaBaru.trim() !== '') {
+    dataBuku[index].nama = namaBaru.trim();
+    
+    // SIMPAN PERUBAHAN & UPDATE TAMPILAN
+    simpanKeLocalStorage();
+    tampilkanData();
+  }
+}
+
+// 7. Fungsi Hapus Buku (Menggunakan .splice())
+function hapusBuku(index) {
+  if (confirm(`Yakin ingin menghapus "${dataBuku[index].nama}"?`)) {
+    // Hapus 1 data berdasarkan posisi index
+    dataBuku.splice(index, 1);
+
+    // SIMPAN PERUBAHAN & UPDATE TAMPILAN
+    simpanKeLocalStorage();
+    tampilkanData();
+  }
+}
+
+// 8. Jalankan fungsi tambahBuku saat tombol "Tambah" diklik
 btnTambah.addEventListener('click', tambahBuku);
 
-// 7. Panggil tampilkanData() saat halaman pertama kali dibuka
+// 9. Panggil tampilkanData() saat halaman pertama kali dibuka
 // Agar data yang sudah ada di localStorage langsung muncul
 tampilkanData();
