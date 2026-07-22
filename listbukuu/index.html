@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Buku</title>
+  <!-- Menghubungkan File CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h2>📚 Data Tabel Buku </h2>
+
+  <!-- Form Input Buku -->
+  <form id="bookForm" class="form-group">
+    <input type="text" id="judulInput" placeholder="Judul Buku..." required>
+    <input type="text" id="penulisInput" placeholder="Penulis..." required>
+    <button type="submit" id="btnSave" class="btn-submit">Tambah</button>
+    <button type="button" id="btnCancel" class="btn-cancel">Batal</button>
+  </form>
+
+  <!-- Tabel Data Buku -->
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Judul Buku</th>
+        <th>Penulis</th>
+        <th class="text-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="bookTableBody">
+      <!-- Data dari JS akan dirender di sini -->
+    </tbody>
+  </table>
+
+  <!-- Menghubungkan File JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
