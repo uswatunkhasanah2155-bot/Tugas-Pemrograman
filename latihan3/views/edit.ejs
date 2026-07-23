@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Buku</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen flex items-center justify-center">
+  <div class="max-w-md w-full bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold text-yellow-600 mb-4 border-b pb-2">Edit Buku</h2>
+    
+    <form onsubmit="updateBook(event, '<%= book.id %>')" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Judul Buku</label>
+        <input type="text" id="title" name="title" value="<%= book.title %>" required class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Nama Penulis</label>
+        <!-- Menampilkan nama penulis secara langsung berdasarkan authorId buku -->
+        <% const author = authors.find(a => a.id === book.authorId); %>
+        <input type="text" id="authorName" name="authorName" value="<%= author ? author.name : '' %>" required class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <a href="/" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">Batal</a>
+        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    async function updateBook(event, id) {
+      event.preventDefault();
+      const title = document.getElementById('title').value;
+      const authorName = document.getElementById('authorName').value;
+
+      const res = await fetch(`/api/books/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, authorName })
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        window.location.href = '/'; 
+      } else {
+        alert(result.message || 'Gagal mengupdate buku');
+      }
+    }
+  </script>
+</body>
+</html>

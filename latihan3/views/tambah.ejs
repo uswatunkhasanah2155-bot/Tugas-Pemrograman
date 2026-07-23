@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tambah Buku</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen flex items-center justify-center">
+  <div class="max-w-md w-full bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold text-blue-600 mb-4 border-b pb-2">Tambah Buku Baru</h2>
+    
+    <form onsubmit="addBook(event)" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Judul Buku</label>
+        <input type="text" id="title" name="title" required placeholder="Masukkan judul buku..." class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+      <div>
+        <!-- Diubah menjadi input teks untuk Nama Penulis -->
+        <label class="block text-sm font-medium text-gray-700">Nama Penulis</label>
+        <input type="text" id="authorName" name="authorName" required placeholder="Masukkan nama penulis..." class="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <a href="/" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">Batal</a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    async function addBook(event) {
+      event.preventDefault();
+      const title = document.getElementById('title').value;
+      const authorName = document.getElementById('authorName').value; // Mengambil nama penulis
+
+      const res = await fetch('/api/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, authorName }) // Mengirim authorName ke server
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        window.location.href = '/'; 
+      } else {
+        alert(result.message || 'Gagal menambahkan buku');
+      }
+    }
+  </script>
+</body>
+</html>

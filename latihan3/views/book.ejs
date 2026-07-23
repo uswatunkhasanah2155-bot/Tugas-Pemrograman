@@ -1,0 +1,23 @@
+<ul class="space-y-4">
+  <% if (typeof books !== 'undefined' && books.length > 0) { %>
+    <% books.forEach(book => { %>
+      <% const author = authors.find(a => a.id === book.authorId); %>
+      <li class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm">
+        <div>
+          <span class="font-bold text-gray-800 text-lg"><%= book.title %></span>
+          
+          <!-- Penulis HANYA MUNCUL jika di halaman "Tampilkan Semua" (!filter) -->
+          <% if (!filter) { %>
+            <span class="text-sm text-gray-600 block">Penulis: <span class="font-medium text-blue-600"><%= author ? author.name : 'Tidak Diketahui' %></span></span>
+          <% } %>
+        </div>
+
+        <!-- Tombol Edit & Hapus dimunculkan kembali di semua halaman -->
+        <div class="flex items-center gap-2">
+          <a href="/buku/edit/<%= book.id %>" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Edit</a>
+          <button onclick="deleteBook('<%= book.id %>')" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Hapus</button>
+        </div>
+      </li>
+    <% }) %>
+  <% } %>
+</ul>
