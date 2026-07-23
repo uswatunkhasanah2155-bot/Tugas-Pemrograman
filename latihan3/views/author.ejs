@@ -1,0 +1,35 @@
+<ul class="space-y-4">
+  <% if (typeof authors !== 'undefined' && authors.length > 0) { %>
+    <% authors.forEach(author => { %>
+      <li class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm">
+        <div>
+          <span class="font-bold text-gray-800 text-lg"><%= author.name %></span>
+          <span class="text-xs text-gray-500 block mt-1">Data Penulis</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="alert('Fitur edit penulis')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Edit</button>
+          <button onclick="deleteAuthor('<%= author.id %>')" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Hapus</button>
+        </div>
+      </li>
+    <% }) %>
+  <% } %>
+</ul>
+
+<script>
+  async function deleteAuthor(id) {
+    if (confirm('Yakin ingin menghapus penulis ini?')) {
+      try {
+        const response = await fetch(`/api/authors/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (result.success) {
+          window.location.reload();
+        } else {
+          alert(result.message || 'Gagal menghapus penulis');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('Terjadi kesalahan pada server');
+      }
+    }
+  }
+</script>

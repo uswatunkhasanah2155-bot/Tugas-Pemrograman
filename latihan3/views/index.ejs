@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen">
+
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="mb-6 text-center">
+      <h1 class="text-3xl font-bold text-blue-600">📚 Katalog Buku & Penulis</h1>
+      <p class="text-gray-600">Integrasi EJS Template Engine & API Express.js</p>
+    </header>
+
+    <!-- Tombol Navigasi / Filter -->
+    <div class="flex justify-center gap-3 mb-8">
+      <a href="/" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg font-medium shadow transition">
+        Tampilkan Semua
+      </a>
+      <a href="/?filter=buku" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow transition">
+        Daftar Buku
+      </a>
+      <a href="/?filter=penulis" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium shadow transition">
+        Daftar Penulis
+      </a>
+    </div>
+
+    <!-- SATU KOTAK BESAR UTAMA -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      
+      <!-- Judul Kotak & Tombol Tambah Buku -->
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h2 class="text-xl font-semibold text-purple-600">Semua Data (Buku & Penulis)</h2>
+        <a href="/buku/tambah" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition shadow">
+          + Tambah Buku
+        </a>
+      </div>
+      
+      <div class="space-y-6">
+        
+        <!-- Hanya Memanggil book.ejs saja, author.ejs dihapus dari sini -->
+        <% if (!filter || filter === 'buku') { %>
+          <div>
+            <%- include('book', { books, authors, filter }) %>
+          </div>
+        <% } %>
+
+        <!-- Jika tombol 'Daftar Penulis' diklik di atas, baru author.ejs muncul -->
+        <% if (filter === 'penulis') { %>
+          <div>
+            <%- include('author', { authors }) %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Script Hapus -->
+  <script>
+    async function deleteBook(id) {
+      if (confirm('Yakin ingin menghapus buku ini?')) {
+        const response = await fetch(`/api/books/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (result.success) window.location.reload();
+        else alert('Gagal menghapus buku');
+      }
+    }
+  </script>
+
+</body>
+</html>
