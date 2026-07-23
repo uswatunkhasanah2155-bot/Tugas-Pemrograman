@@ -56,4 +56,4 @@ app.get('/api/authors', (req, res) => {
 // Jalankan Server
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+}); 
