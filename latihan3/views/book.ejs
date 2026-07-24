@@ -1,23 +1,192 @@
-<ul class="space-y-4">
-  <% if (typeof books !== 'undefined' && books.length > 0) { %>
-    <% books.forEach(book => { %>
-      <% const author = authors.find(a => a.id === book.authorId); %>
-      <li class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm">
-        <div>
-          <span class="font-bold text-gray-800 text-lg"><%= book.title %></span>
-          
-          <!-- Penulis HANYA MUNCUL jika di halaman "Tampilkan Semua" (!filter) -->
-          <% if (!filter) { %>
-            <span class="text-sm text-gray-600 block">Penulis: <span class="font-medium text-blue-600"><%= author ? author.name : 'Tidak Diketahui' %></span></span>
-          <% } %>
-        </div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-6 min-h-screen">
 
-        <!-- Tombol Edit & Hapus dimunculkan kembali di semua halaman -->
-        <div class="flex items-center gap-2">
-          <a href="/buku/edit/<%= book.id %>" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Edit</a>
-          <button onclick="deleteBook('<%= book.id %>')" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Hapus</button>
-        </div>
-      </li>
-    <% }) %>
-  <% } %>
-</ul>
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="mb-6 text-center">
+      <h1 class="text-3xl font-bold text-blue-600">📚 Katalog Buku & Penulis</h1>
+      <p class="text-gray-600">Integrasi EJS Template Engine & API Express.js</p>
+    </header>
+
+    <!-- Tombol Navigasi / Filter -->
+    <div class="flex justify-center gap-3 mb-8">
+      <button onclick="changeFilter('')" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg font-medium shadow transition cursor-pointer">
+        Tampilkan Semua
+      </button>
+      <button onclick="changeFilter('buku')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow transition cursor-pointer">
+        Daftar Buku
+      </button>
+      <button onclick="changeFilter('penulis')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium shadow transition cursor-pointer">
+        Daftar Penulis
+      </button>
+    </div>
+
+    <!-- SATU KOTAK BESAR UTAMA -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      
+      <!-- Judul Kotak & Tombol Tambah Buku -->
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h2 id="section-title" class="text-xl font-semibold text-purple-600">Semua Data (Buku & Penulis)</h2>
+        <a href="/buku/tambah" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition shadow">
+          + Tambah Buku
+        </a>
+      </div>
+      
+      <!-- Wadah Konten Dinamis -->
+      <div id="dynamic-container" class="space-y-6">
+        <p class="text-gray-500 italic">Memuat data dari API...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPT UTAMA UNTUK FETCH API & RENDER STYLE ASLI ANDA -->
+  <script>
+    let globalBooks = [];
+    let globalAuthors = [];
+    let currentFilter = ''; // '' = Semua, 'buku' = Buku saja, 'penulis' = Penulis saja
+
+    // Fungsi utama mengambil data API agar muncul di Network Inspect
+    async function loadApiData() {
+      try {
+        const [resBooks, resAuthors] = await Promise.all([
+          fetch('/api/books').then(res => res.json()),
+          fetch('/api/authors').then(res => res.json())
+        ]);
+
+        globalBooks = resBooks;
+        globalAuthors = resAuthors;
+        renderUI();
+      } catch (error) {
+        console.error('Gagal mengambil data API:', error);
+        document.getElementById('dynamic-container').innerHTML = `<p class="text-red-500 font-bold">Gagal memuat data dari server.</p>`;
+      }
+    }
+
+    // Fungsi untuk mengganti filter saat tombol navigasi diklik
+    function changeFilter(filterType) {
+      currentFilter = filterType;
+      
+      // Ubah judul kotak utama menyesuaikan filter
+      const titleEl = document.getElementById('section-title');
+      if (filterType === 'buku') titleEl.innerText = 'Daftar Buku';
+      else if (filterType === 'penulis') titleEl.innerText = 'Daftar Penulis';
+      else titleEl.innerText = 'Semua Data (Buku & Penulis)';
+
+      renderUI();
+    }
+
+    // Fungsi untuk merender tampilan menggunakan style asli Anda
+    function renderUI() {
+      const container = document.getElementById('dynamic-container');
+      container.innerHTML = '';
+
+      // 1. Render Bagian Buku (Muncul jika filter '' atau 'buku')
+      if (currentFilter === '' || currentFilter === 'buku') {
+        let booksHtml = `<div class="space-y-4">`;
+        if (currentFilter === '') {
+          booksHtml += `<h3 class="font-bold text-lg text-gray-700">Daftar Buku</h3>`;
+        }
+        
+        if (globalBooks.length === 0) {
+          booksHtml += `<p class="text-gray-500 text-sm italic">Tidak ada buku tersedia.</p>`;
+        } else {
+          booksHtml += `<ul class="space-y-4">`;
+          globalBooks.forEach(book => {
+            const author = globalAuthors.find(a => a.id === book.authorId);
+            
+            // Menggunakan style asli milik Anda persis
+            booksHtml += `
+              <li class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm">
+                <div>
+                  <span class="font-bold text-gray-800 text-lg">${book.title}</span>
+                  
+                  <!-- Penulis HANYA MUNCUL jika di halaman "Tampilkan Semua" (!filter) -->
+                  ${currentFilter === '' ? `
+                    <span class="text-sm text-gray-600 block">Penulis: <span class="font-medium text-blue-600">${author ? author.name : 'Tidak Diketahui'}</span></span>
+                  ` : ''}
+                </div>
+
+                <!-- Tombol Edit & Hapus -->
+                <div class="flex items-center gap-2">
+                  <a href="/buku/edit/${book.id}" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-3 py-1.5 rounded transition font-medium">Edit</a>
+                  <button onclick="deleteBook('${book.id}')" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded transition font-medium cursor-pointer">Hapus</button>
+                </div>
+              </li>
+            `;
+          });
+          booksHtml += `</ul>`;
+        }
+        booksHtml += `</div>`;
+        container.innerHTML += booksHtml;
+      }
+
+      // 2. Render Bagian Penulis (Muncul jika filter '' atau 'penulis')
+      if (currentFilter === '' || currentFilter === 'penulis') {
+        let authorsHtml = `<div class="space-y-4 mt-6">`;
+        if (currentFilter === '') {
+          authorsHtml += `<h3 class="font-bold text-lg text-gray-700">Daftar Penulis</h3>`;
+        }
+
+        if (globalAuthors.length === 0) {
+          authorsHtml += `<p class="text-gray-500 text-sm italic">Tidak ada penulis tersedia.</p>`;
+        } else {
+          authorsHtml += `<ul class="space-y-4">`;
+          globalAuthors.forEach(author => {
+            // Menggunakan style senada untuk elemen penulis
+            authorsHtml += `
+              <li class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm">
+                <div>
+                  <span class="font-bold text-gray-800 text-lg">${author.name}</span>
+                  <span class="text-sm text-gray-600 block">Bio: ${author.bio || 'Tidak ada bio'}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="deleteAuthor('${author.id}')" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded transition font-medium cursor-pointer">Hapus</button>
+                </div>
+              </li>
+            `;
+          });
+          authorsHtml += `</ul>`;
+        }
+        authorsHtml += `</div>`;
+        container.innerHTML += authorsHtml;
+      }
+    }
+
+    // Fungsi Hapus Buku via Fetch API
+    async function deleteBook(id) {
+      if (!confirm('Yakin ingin menghapus buku ini?')) return;
+      const response = await fetch(`/api/books/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (result.success || response.ok) {
+        loadApiData(); // Muat ulang data otomatis setelah hapus
+      } else {
+        alert('Gagal menghapus buku');
+      }
+    }
+
+    // Fungsi Hapus Penulis via Fetch API
+    async function deleteAuthor(id) {
+      if (!confirm('Yakin ingin menghapus penulis ini?')) return;
+      const response = await fetch(`/api/authors/${id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (result.success || response.ok) {
+        loadApiData(); // Muat ulang data otomatis setelah hapus
+      } else {
+        alert('Gagal menghapus penulis');
+      }
+    }
+
+    // Eksekusi pemanggilan data pertama kali saat halaman dibuka
+    loadApiData();
+  </script>
+
+</body>
+</html>
